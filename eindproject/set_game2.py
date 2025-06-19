@@ -3,7 +3,7 @@ import os
 import random
 import time
 
-#weergave van de kaarten in de game panel
+#weergave van de kaarten in de game
 Kaart_breed = 120
 Kaart_hoogte = 80
 Kaarten_per_rij= 4
@@ -49,10 +49,10 @@ running = True
 
 class Kaart:
     def __init__(self, bestandsnaam):
-        self.bestandnaam = bestandsnaam
+        self.bestandsnaam = bestandsnaam
         self.kenmerken = self.lees_bestandsnaam(bestandsnaam)
         self.afbeelding = pygame.transform.scale(pygame.image.load(bestandsnaam), (Kaart_breed, Kaart_hoogte))
-    def lees_bestandsnaam(bestandsnaam):
+    def lees_bestandsnaam(self, bestandsnaam):
     #pakt van elke kaart bestandsnaam elk kenmerk apart
         naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
     #van elk kenmerk een lijst maken met alle soorten om vervolgens
@@ -86,7 +86,7 @@ random.shuffle(all_paths)
 deck = [Kaart(p) for p in all_paths]
 table = deck[:12]
 deck = deck[12:]
-selected = [] 
+geselecteerd = [] 
 
 def setje(kaart1,kaart2,kaart3):
     #3 kaarten zijn een set wanneer elk kenmerk of alles verschillend
@@ -113,7 +113,7 @@ def vind_alle_sets(kaarten):
     return alle_sets 
 
 while running:
-    teken_kaarten(table, selected)
+    teken_kaarten(table, geselecteerd)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -123,27 +123,27 @@ while running:
             row = (y - rijopvulling) // (Kaart_hoogte + rijopvulling)
             idx = row * Kaarten_per_rij + col
             if 0 <= idx < len(table):
-                if idx in selected:
-                    selected.remove(idx)
+                if idx in geselecteerd:
+                    geselecteerd.remove(idx)
                 else:
-                    selected.append(idx)
-            if len(selected) == 3:
+                    geselecteerd.append(idx)
+            if len(geselecteerd) == 3:
                 c1, c2, c3 = selected
                 if setje(table[c1], table[c2], table[c3]):
-                    player_score += 1
-                    print(f"Player scored! Total: {player_score}")
-                    for i in sorted(selected, reverse=True):
+                    score_speler += 1
+                    print(f"Player scored! Total: {score_speler}")
+                    for i in sorted(geselecteerd, reverse=True):
                         del table[i]
                     while len(table) < 12 and deck:
                         table.append(deck.pop(0))
-                        start_time = time.time()
+                        start_tijd = time.time()
                 else:
                     print("Not a set.")
-                selected = []
+                geselecteerd = []
 
 
     # Check timer for computer move
-    if time.time() - start_time > tijd_limiet:
+    if time.time() - start_tijd > tijd_limiet:
         sets_found = vind_alle_sets(table)
         if sets_found:
         # Computer speelt eerste gevonden set
@@ -152,8 +152,8 @@ while running:
                 del table[i]
             while len(table) < 12 and deck:
                 table.append(deck.pop(0))
-            computer_score += 1
-            print(f"Computer scored! Total: {computer_score}")
+            score_computer += 1
+            print(f"Computer scored! Total: {score_computer}")
         else:
         # Geen enkele set op tafel: verwijder bovenste 3 kaarten
             print("No sets found. Removing top 3 cards from the table.")
@@ -162,8 +162,8 @@ while running:
                     table.pop(0)
             while len(table) < 12 and deck:
                 table.append(deck.pop(0))
-        selected = []
-        start_time = time.time()
+        geselecteerd = []
+        start_tijd = time.time()
 
 
 
