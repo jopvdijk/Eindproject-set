@@ -40,54 +40,53 @@ def teken_kaarten(kaarten, geselecteerd):
     pygame.display.flip()
 
 # set up 
+
+
+score_speler = 0
+score_computer = 0
+start_tijd = time.time() 
+running = True
+
+class Kaart:
+    def __init__(self, bestandsnaam):
+        self.bestandnaam = bestandsnaam
+        self.kenmerken = self.lees_bestandsnaam(bestandsnaam)
+        self.afbeelding = pygame.transform.scale(pygame.image.load(bestandsnaam), (Kaart_breed, Kaart_hoogte))
+    def lees_bestandsnaam(bestandsnaam):
+    #pakt van elke kaart bestandsnaam elk kenmerk apart
+        naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
+    #van elk kenmerk een lijst maken met alle soorten om vervolgens
+    #een nummer eeraan te kunnen geven 
+        kleuren = ["red", "green", "purple"]
+        vormen = ["oval", "squigle", "diamond"]
+        vullingen = ["empty", "shaded", "filled"]
+        aantallen = ["1", "2", "3"]
+#erkent een bepaalde waarde aan elk kenmerk 
+        for i, kleur in enumerate(kleuren):
+            if kleur in naam:
+                kleur_waarde = i
+                break
+        for i, vorm in enumerate(vormen):
+            if vorm in naam:
+                vorm_waarde = i
+                break
+        for i, vulling in enumerate(vullingen):
+            if vulling in naam:
+                vulling_waarde = i
+                break
+        for i, aantal in enumerate(aantallen):
+            if aantal in naam:
+                aantal_waarde = i
+                break
+#geeft nu dan per kaart een lijst met waarden die elk voor een kenmerk staan
+        return [aantal_waarde, vorm_waarde, kleur_waarde, vulling_waarde]
+
 all_paths = [os.path.join(Kaarten, f) for f in os.listdir(Kaarten) if f.endswith('.gif')]
 random.shuffle(all_paths)
 deck = [Kaart(p) for p in all_paths]
 table = deck[:12]
 deck = deck[12:]
 selected = [] 
-
-score_speler = 0
-score_computer = 0
-start_tijd = time.time
-running = True
-
-
-def lees_bestandsnaam(bestandsnaam):
-    #pakt van elke kaart bestandsnaam elk kenmerk apart
-    naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
-    #van elk kenmerk een lijst maken met alle soorten om vervolgens
-    #een nummer eeraan te kunnen geven 
-    kleuren = ["red", "green", "purple"]
-    vormen = ["oval", "squigle", "diamond"]
-    vullingen = ["empty", "shaded", "filled"]
-    aantallen = ["1", "2", "3"]
-#erkent een bepaalde waarde aan elk kenmerk 
-    for i, kleur in enumerate(kleuren):
-        if kleur in naam:
-            kleur_waarde = i
-            break
-    for i, vorm in enumerate(vormen):
-        if vorm in naam:
-            vorm_waarde = i
-            break
-    for i, vulling in enumerate(vullingen):
-        if vulling in naam:
-            vulling_waarde = i
-            break
-    for i, aantal in enumerate(aantallen):
-        if aantal in naam:
-            aantal_waarde = i
-            break
-#geeft nu dan per kaart een lijst met waarden die elk voor een kenmerk staan
-    return [aantal_waarde, vorm_waarde, kleur_waarde, vulling_waarde]
-
-class Kaart:
-    def __init__(self, pad):
-        self.pad = pad
-        self.kenmerken = lees_bestandsnaam(pad)
-        self.afbeelding = pygame.transform.scale(pygame.image.load(pad), (Kaart_breed, Kaart_hoogte))
-
 
 def setje(kaart1,kaart2,kaart3):
     #3 kaarten zijn een set wanneer elk kenmerk of alles verschillend
@@ -100,7 +99,7 @@ def setje(kaart1,kaart2,kaart3):
         waarden = {kaart1.kenmerken[i],kaart2.kenmerken[i],kaart3.kenmerken[i]}
         if len(waarden) == 2:
             return False
-        return True 
+    return True 
 
 # checkt voor alle mogelijke combinaties i,j,k kaarten of het voldoet
 # aan de eisen van def setje en voegt het toe aan lijst alle_sets 
@@ -164,7 +163,6 @@ while running:
                 table.append(deck.pop(0))
         selected = []
         start_time = time.time()
-        jop is lekker
 
 
 
