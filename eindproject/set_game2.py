@@ -136,10 +136,11 @@ while running:
                         del table[i]
                     while len(table) < 12 and deck:
                         table.append(deck.pop(0))
+                        start_time = time.time()
                 else:
                     print("Not a set.")
                 selected = []
-                start_time = time.time()
+
 
     # Check timer for computer move
     if time.time() - start_time > tijd_limiet:
