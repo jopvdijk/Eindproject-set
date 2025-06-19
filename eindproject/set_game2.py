@@ -164,6 +164,18 @@ while running:
                 table.append(deck.pop(0))
         selected = []
         start_time = time.time()
+        jop is lekker
+
+
+
+
+    
+
+
+    
+
+
+
 
 
     
