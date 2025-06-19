@@ -1,0 +1,95 @@
+---
+title: "Hands-in R (part1.2)"
+subtitle: "Data Types"
+author: ""
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Introduction
+
+This assignment is all about different data types in R.
+
+Test the R code in each chunk within your Rmd file, and regularly knit the html to check for errors.
+
+Consult the [Base R Cheat Sheet](https://iqss.github.io/dss-workshops/R/Rintro/base-r-cheat-sheet.pdf) and the [R Markdown Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) for help.
+
+## Data Objects
+
+### Vectors
+
+a.  Below you see code that makes 5 vectors containing information about planets. Run this code in your Rmd file, and check the classes of these vectors in your workspace.
+
+```{r}
+name <- c("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune") 
+
+type <- factor(c("Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Gas giant", "Gas giant", "Gas giant", "Gas giant")) 
+
+diameter <- c(0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883) 
+
+rotation <- c(58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67) 
+
+rings <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
+```
+
+b.  Display the 2nd element of `rotation`.
+
+c.  Display the 1st and 2nd elements of `name`.
+
+d.  Display the 1st and 6th elements of `type`.
+
+e.  Display a logical vector that has value `TRUE` when `diameter > 1` and value `FALSE` otherwise.
+
+f.  Display the names of the planets with a diameter greater than 1.
+
+### Matrices
+
+1.  Collect the above five vectors in a matrix called `planets`, and display the result.
+
+2.  Display the classes of the columns of `planets` with the function `apply()`.
+
+3.  Remake the matrix `planets` (overwrite the previous version) using only the vectors the four vectors `type`,`diameter`, `rotation`and `rings`, and then add the vector `name` to the matrix as row names. Display the result.
+
+4.  Again, display the classes of the columns of the matrix `planets`. What is the difference with the previous version?
+
+5.  Display the 3rd column of the matrix `planets` as vector.
+
+6.  Display the 3rd column of the matrix `planets` as a matrix.
+
+7.  Display the row of `planets` corresponding to “Venus”.
+
+8.  Display the elements in the 3rd row and the 2nd and 3rd columns of `planets`.
+
+9.  Display `planets` leaving out the 1st row and 1st column.
+
+### Data frames
+
+1.  Make a data frame called `planets_df` containing all five vectors as variables.
+
+2.  Display the classes of the variables in `planets_df` with the function `sapply()`.
+
+3.  Display the variable `type` from`planets_df` as a vector.
+
+4.  Display the variable `type` from `planets_df` as a data frame.
+
+5.  Display the 5th element of the variable `name` using a dollar sign and square brackets.
+
+### Lists
+
+1.  Make a list called `planet_list` with its 1st element called “matrix” containing the matrix `planets`, and its 2nd element called “data frame” (make sure to add the space between “data” and “frame”) containing the data frame “planet_df”.
+
+```         
+planets_list <- list(matrix = planets, "data frame" = planets_df)
+```
+
+2.  Display the 2nd list element.
+
+3.  Display the list element called “matrix”.
+
+4.  Display the variable “rotation” of the list element “planets_df” as data frame.
+
+5.  Display the 2nd element of the variable “rotation” of the list element “planets_df”.
+
+6.  Add a 3rd element called “my name” to `planets_list` containing your name.
+
+When finished, check if the html knit succesfuly, and submit your Rmd file with your name in the YAML to Blackboard before the deadline.

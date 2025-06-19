@@ -1,0 +1,189 @@
+---
+title: "Hands-in R (part1.1)"
+subtitle: "Working with R "
+author: ""
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+In this assignment you get familiar with R, RStudio and R Markdown. To make the assignment, open the file "Hands-in R (intro_part1.1).Rmd" in RStudio. This Rmd file already contains the formatted text of the assignment. If you "knit" this file, it will render an html document that is identical to the original one. If you click on the "Visual" tab at the top of the file, you get a preview of what the html will look like.
+
+All you have to do to make this assignment is to fill in your name as author in the YAML, and insert R chunks with the appropriate R code and chunk options to make the exercises.
+
+To get help on the exercises of this assignment, consult the following sections of the cheat sheets:
+
+-   [Base R Cheat Sheet](https://github.com/rstudio/cheatsheets/blob/main/base-r.pdf)
+    -   Getting Help
+    -   Using Packages
+    -   Vectors: Creating Vectors
+    -   Math Functions
+    -   Variable Assignment
+-   [R Markdown Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+    -   Sections 1 to 6
+-   [Yarrr 4.3.2: Spacing](https://bookdown.org/ndphillips/YaRrr/a-brief-style-guide-commenting-and-spacing.html#spacing)
+    -   in the exercises, use spaces around the operators `<-`, `+`, `-`, `*`, `/`, but not around `^`!
+
+# The assignment operator `<-`
+
+You can do calculations in R without storing the results. For example, the following R chunk displays the square root of 10:
+
+```{r}
+sqrt(10)
+```
+
+The result of this computation, however, is not stored anywhere by R. You can check this by running the code within this Rmd file by either:
+
+-   placing your cursor anywhere on the code and hit `Ctrl/Cmd + Enter`, or
+
+-   clicking the little green arrow at the right of the R chunk
+
+If you do this, you will see that the workspace remains empty.
+
+If you like to save the result for later use, you need to assign the result of `sqrt(10)` to an object. Assignments in R are made with the assignment operator `<-`. Type this symbol in the Help tab for more information. The shortcut key for the assignment operator is `Ctrl/Cmd + -`.
+
+a.  In the R chunk below, assign the value of `sqrt(10)` to the object `sqrt10`.
+
+```{r}
+
+```
+
+If you have done this correctly and you run this line of code within your Rmd file, the object `sqrt10` should appear in workspace.
+
+# Vector assignment
+
+Vectors are R objects with more than one element and form the basis of data analysis in R. For example, the variables $y=(8, 6, 4, 2)$ and $x=(1, 3, 5, 7)$ are vectors.
+
+a.  Insert an R chunk below, and make the vector `y` using the function `c()`. Run the code within your Rmd file to check if your code is correct.
+
+```{r}
+
+```
+
+Another way to make vectors is with the function `seq()`. Check the help page of this function by typing `seq` in the Help tab, or by running `?seq` in the console.
+
+b.  Insert an R chunk below, and use the function `seq()` with the argument `by` to make the vector `x`, and display the result (embed the line of code in round brackets or simply type `x` on the next line).
+
+```{r}
+
+```
+
+c.  In a new chunk,make the logical vector `z` containing the values `(T, F, T, F)` (you may abbreviate logical values `TRUE` and `FALSE`).
+
+```{r}
+
+```
+
+# Vector arithmetic
+
+You can do addition, subtraction, multiplication, division, exponentiation, etc. with vectors of the same length. For example $$
+\left(\begin{array}{c}
+a\\
+b
+\end{array}\right)\times
+\left(\begin{array}{c}
+c\\
+d
+\end{array}\right)=
+\left(\begin{array}{c}
+a\times c\\
+b\times d
+\end{array}\right)
+$$ For the next exercises, display the results without saving them (hence without using the assignment operator).
+
+a.  Add the vector `x` to the vector `y`.
+
+```{r}
+
+```
+
+b.  Subtract the vector `x` from the vector `y`.
+
+```{r}
+
+```
+
+It is also possible to do arithmetic with a scalar and a vector.
+
+c.  Multiply the vector `y` by 2.
+
+```{r}
+
+```
+
+You can also do arithmetic with logical vector.
+
+d.  Multiply `x` and `z` (without saving the result). Interpret the result.
+
+```{r}
+
+```
+
+e.  Take the square of the vector `x`.
+
+```{r}
+
+```
+
+The math functions in the Base R Cheat Sheet apply to each element of function.
+
+f.  Take the exponent of the vector `x`.
+
+```{r}
+
+```
+
+g.  Display the mean and variance of `x` (with a single R chunk).
+
+```{r}
+
+```
+
+# Chunk options
+
+Section "5. Embed Code" off the R Markdown Cheat Sheet describes the use chunk options to manipulate the display of R in- and output in the html document.
+
+Let's first try out the `echo` option. The default `echo=TRUE` option ensures that all R code in all R chunks is also displayed in the rendered html document.
+
+a.  Insert an R chunk that displays the correlation of `x` and `y`, but not the code.
+
+```{r echo=F}
+
+```
+
+The option `eval=FALSE` prevents the execution of the code in the R chunk, which is convenient if you only want to show code, but not execute it.
+
+b.  In an R chunk with option `eval=FALSE`, assign the product of the vectors `x` and `y` to the object `xy`.
+
+```{r eval=F}
+
+```
+
+If your code has errors, knitting of the html document will fail. The option `error=TRUE` ensures that your html will knit, and displays the error message. This option is convenient for the exam, when your code has errors but you still have to render an html document ;-).
+
+c.  Insert an R chunk that displays the content of the object `xy`. This will produce an error message, because the code of the previous chunk was not executed. To ensure that your html will knit, include the `error=TRUE`.
+
+```{r}
+
+```
+
+The option `include=FALSE` executes the code, but does not display the in- and output of the code. This is convenient when you have to execute code that is of no interest to your audience.
+
+d.  Insert an R chunk with option `include=FALSE` that assigns the product of the vectors `x` and `y` to the object `xy`.
+
+```{r}
+
+```
+
+e.  Insert an R chunk that displays the content of `xy`.
+
+```{r}
+
+```
+
+# Knit
+
+Knit the html document. If it knits correctly, submit your Rmd file with your name in the YAML to Blackboard before the deadline.
+
+------------------------------------------------------------------------
+
+End of assignment.
