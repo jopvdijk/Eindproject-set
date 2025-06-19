@@ -45,6 +45,7 @@ def lees_bestandsnaam(bestandsnaam):
     return [aantal_waarde, vorm_waarde, kleur_waarde, vulling_waarde]
 
 
+
 def check_set(bestand):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
     kleuren = ["red", "green", "purple"]
@@ -68,7 +69,7 @@ def check_set(bestand):
     #en dat transleert dan naar lijst van lengte 1 of 3 dus 
     #een fucntie def is_set zal dan checkcen of t 1 of 3 is en alleen 
     #dan true geven 
-
+Jop is lekker
 
 
 
