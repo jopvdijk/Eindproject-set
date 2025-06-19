@@ -1,180 +1,153 @@
-import pygame 
+import pygame
 import os
 import random
 import time
 
-#weergave van de kaarten in de game
-Kaart_breed = 120
-Kaart_hoogte = 80
-Kaarten_per_rij= 4
-Kaarten_per_kolom=3
-rijopvulling= 20
-tijd_limiet = 30  
-Kaarten = "kaarten"
-rijen = 3
-#kaartkenmerken
-kleuren = ["red", "green", "purple"]
-vormen = ["oval", "squigle", "diamond"]
-vullingen = ["empty", "shaded", "filled"]
-aantallen = ["1", "2", "3"]
+# --- configuratie ---
+kaart_breedte = 120
+kaart_hoogte = 80
+kaarten_per_rij = 4
+marge = 20
+tijd_per_beurt = 30  # seconden om een set te vinden
+map_kaarten = "kaarten"
 
-pygame.init()
-font = pygame.font.SysFont("Arial", 20)
-breedte_venster = Kaart_breed * Kaarten_per_rij + rijopvulling * (Kaarten_per_rij + 1)
-hoogte_venster = Kaart_hoogte * rijen + rijopvulling * (rijen + 1) + 40
-scherm = pygame.display.set_mode((breedte_venster, hoogte_venster))
-pygame.display.set_caption("SET Spel")
-
-def teken_kaarten(kaarten, geselecteerd):
-    scherm.fill((255, 255, 255))
-    for i, kaart in enumerate(kaarten):
-        rij = i // Kaarten_per_rij
-        kolom = i % Kaarten_per_rij
-        x = rijopvulling + kolom * (Kaart_breed + rijopvulling)
-        y = rijopvulling + rij * (Kaart_hoogte + rijopvulling)
-        scherm.blit(kaart.image, (x, y))
-        label = font.render(str(i + 1), True, (0, 0, 0))
-        scherm.blit(label, (x + 5, y + 5))
-        if i in geselecteerd:
-            pygame.draw.rect(scherm, (255, 0, 0), (x, y, Kaart_breed, Kaart_hoogte), 4)
-    pygame.display.flip()
-
-# set up 
+kleuren = ['rood', 'groen', 'paars']
+vormen = ['ruit', 'golf', 'ovaal']
+vullingen = ['open', 'gevuld', 'gestreept']
 
 
-score_speler = 0
-score_computer = 0
-start_tijd = time.time() 
-running = True
+# --- hulpfunctie om eigenschappen uit bestandsnaam te halen ---
+def lees_bestandsnaam(bestandsnaam):
+    naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
 
-class Kaart:
-    def __init__(self, bestandsnaam):
-        self.bestandsnaam = bestandsnaam
-        self.kenmerken = self.lees_bestandsnaam(bestandsnaam)
-        self.afbeelding = pygame.transform.scale(pygame.image.load(bestandsnaam), (Kaart_breed, Kaart_hoogte))
-    def lees_bestandsnaam(self, bestandsnaam):
-    #pakt van elke kaart bestandsnaam elk kenmerk apart
-        naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
-    #van elk kenmerk een lijst maken met alle soorten om vervolgens
-    #een nummer eeraan te kunnen geven 
-        kleuren = ["red", "green", "purple"]
-        vormen = ["oval", "squigle", "diamond"]
-        vullingen = ["empty", "shaded", "filled"]
-        aantallen = ["1", "2", "3"]
-#erkent een bepaalde waarde aan elk kenmerk 
-        for i, kleur in enumerate(kleuren):
-            if kleur in naam:
-                kleur_waarde = i
-                break
-        for i, vorm in enumerate(vormen):
-            if vorm in naam:
-                vorm_waarde = i
-                break
-        for i, vulling in enumerate(vullingen):
-            if vulling in naam:
-                vulling_waarde = i
-                break
-        for i, aantal in enumerate(aantallen):
-            if aantal in naam:
-                aantal_waarde = i
-                break
-#geeft nu dan per kaart een lijst met waarden die elk voor een kenmerk staan
-        return [aantal_waarde, vorm_waarde, kleur_waarde, vulling_waarde]
+    kleur_opties = ['red', 'green', 'purple']
+    vorm_opties = ['oval', 'squiggle', 'diamond']
+    vulling_opties = ['empty', 'shaded', 'filled']
+    aantal_opties = ['1', '2', '3']
 
-all_paths = [os.path.join(Kaarten, f) for f in os.listdir(Kaarten) if f.endswith('.gif')]
-random.shuffle(all_paths)
-deck = [Kaart(p) for p in all_paths]
-table = deck[:12]
-deck = deck[12:]
-geselecteerd = [] 
+    kleur = next(i for i, k in enumerate(kleur_opties) if k in naam)
+    vorm = next(i for i, v in enumerate(vorm_opties) if v in naam)
+    vulling = next(i for i, v in enumerate(vulling_opties) if v in naam)
+    aantal = next(i for i, a in enumerate(aantal_opties) if a in naam)
 
-def setje(kaart1,kaart2,kaart3):
-    #3 kaarten zijn een set wanneer elk kenmerk of alles verschillend
-    #heeft of alles hetzelfde, waarmee dus de lengte van de waarden
-    #van de bijbehorende kenmerekn dan 3 zou zijn als ze verschillend zijn
-    #en 1 wanneer ze allemaal hetzeflde zijn, wat dan een set maakt 
-    #bij len 2 verschillen 2 kaarten van kenmerk wat nooit een set kan zijn
-    #waarmee dus wordt gecheckt of er een set is of niet zo.
+    return [aantal, vorm, kleur, vulling]
+
+
+# --- kaartklasse ---
+class kaart:
+    def __init__(self, pad):
+        self.pad = pad
+        self.eigenschappen = lees_bestandsnaam(pad)
+        self.afbeelding = pygame.transform.scale(
+            pygame.image.load(pad), (kaart_breedte, kaart_hoogte)
+        )
+
+
+# --- setlogica ---
+def is_set(k1, k2, k3):
     for i in range(4):
-        waarden = {kaart1.kenmerken[i],kaart2.kenmerken[i],kaart3.kenmerken[i]}
+        waarden = {k1.eigenschappen[i], k2.eigenschappen[i], k3.eigenschappen[i]}
         if len(waarden) == 2:
             return False
-    return True 
+    return True
 
-# checkt voor alle mogelijke combinaties i,j,k kaarten of het voldoet
-# aan de eisen van def setje en voegt het toe aan lijst alle_sets 
-def vind_alle_sets(kaarten):
-    alle_sets = []
+
+def vind_sets(kaarten):
+    gevonden = []
     for i in range(len(kaarten)):
         for j in range(i + 1, len(kaarten)):
             for k in range(j + 1, len(kaarten)):
-                if setje(kaarten[i], kaarten[j], kaarten[k]):
-                    alle_sets.append((i, j, k))
-    return alle_sets 
+                if is_set(kaarten[i], kaarten[j], kaarten[k]):
+                    gevonden.append((i, j, k))
+    return gevonden
 
-while running:
-    teken_kaarten(table, geselecteerd)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            col = (x - rijopvulling) // (Kaart_breed + rijopvulling)
-            row = (y - rijopvulling) // (Kaart_hoogte + rijopvulling)
-            idx = row * Kaarten_per_rij + col
-            if 0 <= idx < len(table):
-                if idx in geselecteerd:
-                    geselecteerd.remove(idx)
+
+# --- pygame setup ---
+pygame.init()
+lettertype = pygame.font.SysFont("arial", 20)
+rijen = 3
+scherm_breedte = kaart_breedte * kaarten_per_rij + marge * (kaarten_per_rij + 1)
+scherm_hoogte = kaart_hoogte * rijen + marge * (rijen + 1) + 40
+scherm = pygame.display.set_mode((scherm_breedte, scherm_hoogte))
+pygame.display.set_caption("set spel")
+
+
+def teken_kaarten(kaarten, geselecteerd):
+    scherm.fill((255, 255, 255))
+    for i, k in enumerate(kaarten):
+        rij = i // kaarten_per_rij
+        kolom = i % kaarten_per_rij
+        x = marge + kolom * (kaart_breedte + marge)
+        y = marge + rij * (kaart_hoogte + marge)
+        scherm.blit(k.afbeelding, (x, y))
+        label = lettertype.render(str(i + 1), True, (0, 0, 0))
+        scherm.blit(label, (x + 5, y + 5))
+        if i in geselecteerd:
+            pygame.draw.rect(scherm, (255, 0, 0), (x, y, kaart_breedte, kaart_hoogte), 4)
+    pygame.display.flip()
+
+
+# --- spelopzet ---
+alle_paden = [os.path.join(map_kaarten, f) for f in os.listdir(map_kaarten) if f.endswith(".gif")]
+random.shuffle(alle_paden)
+stapel = [kaart(p) for p in alle_paden]
+tafel = stapel[:12]
+stapel = stapel[12:]
+
+score_speler = 0
+score_computer = 0
+geselecteerd = []
+starttijd = time.time()
+loopt = True
+
+# --- hoofdlus ---
+while loopt:
+    teken_kaarten(tafel, geselecteerd)
+    for gebeurtenis in pygame.event.get():
+        if gebeurtenis.type == pygame.QUIT:
+            loopt = False
+        elif gebeurtenis.type == pygame.MOUSEBUTTONDOWN:
+            x, y = gebeurtenis.pos
+            kolom = (x - marge) // (kaart_breedte + marge)
+            rij = (y - marge) // (kaart_hoogte + marge)
+            index = rij * kaarten_per_rij + kolom
+            if 0 <= index < len(tafel):
+                if index in geselecteerd:
+                    geselecteerd.remove(index)
                 else:
-                    geselecteerd.append(idx)
+                    geselecteerd.append(index)
             if len(geselecteerd) == 3:
-                c1, c2, c3 = selected
-                if setje(table[c1], table[c2], table[c3]):
+                k1, k2, k3 = geselecteerd
+                if is_set(tafel[k1], tafel[k2], tafel[k3]):
                     score_speler += 1
-                    print(f"Player scored! Total: {score_speler}")
+                    print(f"speler scoorde! totaal: {score_speler}")
                     for i in sorted(geselecteerd, reverse=True):
-                        del table[i]
-                    while len(table) < 12 and deck:
-                        table.append(deck.pop(0))
-                        start_tijd = time.time()
+                        del tafel[i]
+                    while len(tafel) < 12 and stapel:
+                        tafel.append(stapel.pop(0))
+                    starttijd = time.time()
                 else:
-                    print("Not a set.")
+                    print("geen set.")
                 geselecteerd = []
 
-
-    # Check timer for computer move
-    if time.time() - start_tijd > tijd_limiet:
-        sets_found = vind_alle_sets(table)
-        if sets_found:
-        # Computer speelt eerste gevonden set
-            c1, c2, c3 = sets_found[0]
-            for i in sorted((c1, c2, c3), reverse=True):
-                del table[i]
-            while len(table) < 12 and deck:
-                table.append(deck.pop(0))
+    if time.time() - starttijd > tijd_per_beurt:
+        sets = vind_sets(tafel)
+        if sets:
+            k1, k2, k3 = sets[0]
+            for i in sorted((k1, k2, k3), reverse=True):
+                del tafel[i]
+            while len(tafel) < 12 and stapel:
+                tafel.append(stapel.pop(0))
             score_computer += 1
-            print(f"Computer scored! Total: {score_computer}")
+            print(f"computer scoorde! totaal: {score_computer}")
         else:
-        # Geen enkele set op tafel: verwijder bovenste 3 kaarten
-            print("No sets found. Removing top 3 cards from the table.")
+            print("geen sets gevonden. verwijder bovenste 3 kaarten.")
             for _ in range(3):
-                if table:
-                    table.pop(0)
-            while len(table) < 12 and deck:
-                table.append(deck.pop(0))
+                if tafel:
+                    tafel.pop(0)
+            while len(tafel) < 12 and stapel:
+                tafel.append(stapel.pop(0))
         geselecteerd = []
-        start_tijd = time.time()
+        starttijd = time.time()
 
-
-
-
-    
-
-
-    
-
-
-
-
-
-    
+pygame.quit()
