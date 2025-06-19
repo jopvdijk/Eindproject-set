@@ -166,15 +166,4 @@ while running:
         start_time = time.time()
 
 
-
-
-    
-
-
-    
-
-
-
-
-
     
