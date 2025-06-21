@@ -25,10 +25,22 @@ def lees_bestandsnaam(bestandsnaam):
     vulling_opties = ['empty', 'shaded', 'filled']
     aantal_opties = ['1', '2', '3']
 
-    kleur = next(i for i, k in enumerate(kleur_opties) if k in naam)
-    vorm = next(i for i, v in enumerate(vorm_opties) if v in naam)
-    vulling = next(i for i, v in enumerate(vulling_opties) if v in naam)
-    aantal = next(i for i, a in enumerate(aantal_opties) if a in naam)
+        for i, kleur in enumerate(kleuren):
+            if kleur in naam:
+                kleur_waarde = i
+                break
+        for i, vorm in enumerate(vormen):
+            if vorm in naam:
+                vorm_waarde = i
+                break
+        for i, vulling in enumerate(vullingen):
+            if vulling in naam:
+                vulling_waarde = i
+                break
+        for i, aantal in enumerate(aantallen):
+            if aantal in naam:
+                aantal_waarde = i
+                break
     
 # returned een lijst met getallen die voor elke eigenschap staat 
     return [aantal, vorm, kleur, vulling]
