@@ -45,7 +45,6 @@ def lees_bestandsnaam(bestandsnaam):
             aantal_waarde = i
             break
 
-    # Teruggeven van de gevonden waarden (kan je zelf aanpassen)
     return (kleur_waarde, vorm_waarde, vulling_waarde, aantal_waarde)
 
 # class van de kaarten die de functie hierboven gebruikt om de eigenschappen in te vullen
@@ -107,7 +106,6 @@ class Timer:
         return max(0, resterend)
 
     def teken(self, scherm, font):
-        # timer in seconden, afgerond naar boven
         resterend = int(self.tijd_over()) + 1
         tekst = font.render(f"Tijd: {resterend}s", True, (255, 255, 255))  # wit
         scherm.blit(tekst, (10, 10))  # linksboven
@@ -126,43 +124,50 @@ class Scorebord:
         self.computer += 1
 
     def teken(self, scherm, font):
-        # score naast timer weergeven
         tekst_speler = font.render(f"Speler: {self.speler}", True, (255, 255, 255))
         tekst_computer = font.render(f"Computer: {self.computer}", True, (255, 255, 255))
-        scherm.blit(tekst_speler, (10 + 100, 10))  # 100px rechts van timer
-        scherm.blit(tekst_computer, (10 + 100 + tekst_speler.get_width() + 20, 10))  # naast speler
+        scherm.blit(tekst_speler, (120, 10))  # rechts naast timer
+        scherm.blit(tekst_computer, (120 + tekst_speler.get_width() + 20, 10))  # naast speler
 
 
 # deze functie tekent ALLES: kaarten, timer en scorebord in 1 frame
-def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None):
+def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None, computer_set=None):
     scherm.fill((0, 0, 0))  # zwart scherm
 
     timer.teken(scherm, lettertype)  # timer linksboven
     scorebord.teken(scherm, lettertype)  # score rechts van timer
 
-    # kaarten tekenen, houd rekening met ruimte boven voor timer/score (40 pixels)
+    nummer_font = pygame.font.SysFont("arial", 16)  # kleiner lettertype voor nummers
+
     for i in range(len(kaarten)):
         k = kaarten[i]
         rij = i // kaarten_per_rij
         kolom = i % kaarten_per_rij
         x = marge + kolom * (kaart_breedte + marge)
-        y = marge + rij * (kaart_hoogte + marge) + 40  # 40 px ruimte voor timer/score bovenin
+        y = marge + rij * (kaart_hoogte + marge) + 40  # ruimte bovenin voor timer/score
 
         scherm.blit(k.afbeelding, (x, y))
 
-        # kaartnummer in wit linksboven kaart (nummering begint bij 1)
-        label = lettertype.render(str(i + 1), True, (255, 255, 255))
-        scherm.blit(label, (x + 5, y + 5))
+        # Kaartnummer linksboven op de kaart, zwart, iets naar binnen
+        nummer = str(i + 1)
+        tekst = nummer_font.render(nummer, True, (0, 0, 0))
+        scherm.blit(tekst, (x + 5, y + 4))
 
         # Rode rand bij geselecteerde kaarten
         if i in geselecteerd:
             pygame.draw.rect(scherm, (255, 0, 0), (x, y, kaart_breedte, kaart_hoogte), 4)
 
-        # Groene rand als een set is gevonden
+        # Groene rand als een set door speler is gevonden
         if highlight_set and i in highlight_set:
             pygame.draw.rect(scherm, (0, 255, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
 
-    pygame.display.flip()  # alles in 1x scherm updaten
+        # Rode rand als set door computer gekozen wordt getoond
+        if computer_set and i in computer_set:
+            pygame.draw.rect(scherm, (255, 0, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
+
+    pygame.display.flip()
+
+
 
 
 # --- spelopzet ---
@@ -183,63 +188,52 @@ clock = pygame.time.Clock()  # maak klok aan voor FPS limiter
 # --- hoofdlus ---
 while loopt:
     teken_scherm(tafel, geselecteerd, scorebord, timer)  # teken alles in 1 functie
-
+    sets_op_tafel = vind_sets(tafel)
+    computer_keuze = random.choice(sets_op_tafel) if sets_op_tafel else None
     for gebeurtenis in pygame.event.get():
         if gebeurtenis.type == pygame.QUIT:
             loopt = False
         elif gebeurtenis.type == pygame.MOUSEBUTTONDOWN:
             x, y = gebeurtenis.pos
             kolom = (x - marge) // (kaart_breedte + marge)
-            rij = (y - marge - 40) // (kaart_hoogte + marge)  # let op 40 px offset voor timer/score
-            index = rij * kaarten_per_rij + kolom
-            if 0 <= index < len(tafel):
-                if index in geselecteerd:
-                    geselecteerd.remove(index)
-                else:
-                    geselecteerd.append(index)
-            if len(geselecteerd) == 3:
-                k1, k2, k3 = geselecteerd
-                if is_set(tafel[k1], tafel[k2], tafel[k3]):
-                    # Toon groene randjes even, pauzeer dan kort
-                    teken_scherm(tafel, geselecteerd, scorebord, timer, highlight_set=geselecteerd)
-                    pygame.time.delay(500)  # 0.5 seconde pauze
+            rij = (y - marge - 40) // (kaart_hoogte + marge)  # 40 px offset voor timer/score
 
-                    scorebord.speler_scoort()  # speler krijgt punt
-                    print(f"speler scoorde! totaal: {scorebord.speler}")
+            if 0 <= kolom < kaarten_per_rij and 0 <= rij < rijen:
+                index = rij * kaarten_per_rij + kolom
+                if index < len(tafel):
+                    if index in geselecteerd:
+                        geselecteerd.remove(index)
+                    else:
+                        geselecteerd.append(index)
 
-                    # verwijder gevonden set en vul aan
-                    for i in sorted(geselecteerd, reverse=True):
-                        del tafel[i]
-                    while len(tafel) < 12 and stapel:
-                        tafel.append(stapel.pop(0))
+                    if len(geselecteerd) == 3:
+                        i1, i2, i3 = geselecteerd
+                        if is_set(tafel[i1], tafel[i2], tafel[i3]):
+                            teken_scherm(tafel, geselecteerd, scorebord, timer, highlight_set=geselecteerd)
+                            pygame.time.delay(500)  # 0.5 seconde pauze
+                            scorebord.speler_scoort()
+                            # verwijder de kaarten die een set vormen en vervang ze door nieuwe kaarten van de stapel als die er zijn
+                            for i in sorted(geselecteerd, reverse=True):
+                                if stapel:
+                                    tafel[i] = stapel.pop(0)
+                                else:
+                                    del tafel[i]
+                            timer.reset()
+                        else:
+                            # foutieve set, gewoon deselecteren
+                            pass
+                        geselecteerd = []
 
-                    timer.reset()  # reset timer na succesvolle set
-                else:
-                    print("geen set.")
-                geselecteerd = []
-
-    # timer loopt af
+    # timer check
     if timer.tijd_over() <= 0:
-        sets = vind_sets(tafel)
-        if sets:
-            k1, k2, k3 = sets[0]
-            for i in sorted((k1, k2, k3), reverse=True):
-                del tafel[i]
-            while len(tafel) < 12 and stapel:
-                tafel.append(stapel.pop(0))
+        # tijd om = computer krijgt een punt
+        scorebord.computer_scoort()
+        teken_scherm(tafel, geselecteerd, scorebord, timer,highlight_set=computer_keuze)
+        pygame.time.delay(500)  # 0.5 seconde pauze    scorebord.computer_scoort()
+        timer.reset()
 
-            scorebord.computer_scoort()  # computer krijgt punt
-            print(f"computer scoorde! totaal: {scorebord.computer}")
-        else:
-            print("geen sets gevonden. verwijder bovenste 3 kaarten.")
-            for _ in range(3):
-                if tafel:
-                    tafel.pop(0)
-            while len(tafel) < 12 and stapel:
-                tafel.append(stapel.pop(0))
-        geselecteerd = []
-        timer.reset()  # reset timer na beurt computer
 
-    clock.tick(30)  # max 30 frames per seconde
+
+    clock.tick(30)
 
 pygame.quit()
