@@ -26,25 +26,19 @@ def lees_bestandsnaam(bestandsnaam):
     vulling_opties = ['empty', 'shaded', 'filled']
     aantal_opties = ['1', '2', '3']
 
-# 
-    for i in range(len(kleur_opties)):
-        if kleur_opties[i] in naam:
-            kleur_waarde = i
-            break
-
-    for i, kleur in enumerate(kleuren):
+    for i, kleur in enumerate(kleur_opties):
         if kleur in naam:
             kleur_waarde = i
             break
-    for i, vorm in enumerate(vormen):
+    for i, vorm in enumerate(vorm_opties):
         if vorm in naam:
             vorm_waarde = i
             break
-    for i, vulling in enumerate(vullingen):
+    for i, vulling in enumerate(vulling_opties):
         if vulling in naam:
             vulling_waarde = i
             break
-    for i, aantal in enumerate(aantallen):
+    for i, aantal in enumerate(aantal_opties):
         if aantal in naam:
             aantal_waarde = i
             break
