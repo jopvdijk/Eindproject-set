@@ -20,28 +20,32 @@ import os
 def lees_bestandsnaam(bestandsnaam):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
 
+#lijsten van alle verschillende mogelijke kenmerken, zijn in het Engels omdat ze zo in de bestandsnaam staan
     kleur_opties = ['red', 'green', 'purple']
     vorm_opties = ['oval', 'squiggle', 'diamond']
     vulling_opties = ['empty', 'shaded', 'filled']
     aantal_opties = ['1', '2', '3']
 
+# 
     for i in range(len(kleur_opties)):
         if kleur_opties[i] in naam:
             kleur_waarde = i
             break
 
-    for i in range(len(vorm_opties)):
-        if vorm_opties[i] in naam:
+    for i, kleur in enumerate(kleuren):
+        if kleur in naam:
+            kleur_waarde = i
+            break
+    for i, vorm in enumerate(vormen):
+        if vorm in naam:
             vorm_waarde = i
             break
-
-    for i in range(len(vulling_opties)):
-        if vulling_opties[i] in naam:
+    for i, vulling in enumerate(vullingen):
+        if vulling in naam:
             vulling_waarde = i
             break
-
-    for i in range(len(aantal_opties)):
-        if aantal_opties[i] in naam:
+    for i, aantal in enumerate(aantallen):
+        if aantal in naam:
             aantal_waarde = i
             break
 
