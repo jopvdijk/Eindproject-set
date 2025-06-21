@@ -16,36 +16,41 @@ vormen = ['ruit', 'golf', 'ovaal']
 vullingen = ['open', 'gevuld', 'gestreept']
 
 
-# verschillende eigenschappen halen uit de bestandsnaam 
+import os
+#verschillende eigenschappen halen uit bestandsnaam
 def lees_bestandsnaam(bestandsnaam):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
 
-    #lijsten met alle mogelijke eigenschappen zoals ze genoteerd staan in de bestandsnaam van de kaarten 
     kleur_opties = ['red', 'green', 'purple']
     vorm_opties = ['oval', 'squiggle', 'diamond']
     vulling_opties = ['empty', 'shaded', 'filled']
     aantal_opties = ['1', '2', '3']
 
-    # dit werkt door voor een index i en kleur uit de verschillende mogelijke kleuren dan te checken of de kleur in de naam van het bestand zit
-    # als die in het bestand zit dan wordt de output kleurwaarde de index bij de bijbehorende kleur. Deze methode passen we toe op elke eigenschap
-    # zo wordt een output gevormd die de eigenschappen van elke kaart weergeeft aan de hand van een lijst getallen. 
-    for i, kleur in enumerate(kleur_opties):
-            if kleur in naam:
-                kleur_waarde = i
-                break
-    for i, vorm in enumerate(vorm_opties):
-            if vorm in naam:
-                vorm_waarde = i
-                break
-    for i, vulling in enumerate(vulling_opties):
-            if vulling in naam:
-                vulling_waarde = i
-                break
-    for i, aantal in enumerate(aantal_opties):
-            if aantal in naam:
-                aantal_waarde = i
-                break
-     
+    for i in range(len(kleur_opties)):
+        if kleur_opties[i] in naam:
+            kleur_waarde = i
+            break
+
+    for i in range(len(vorm_opties)):
+        if vorm_opties[i] in naam:
+            vorm_waarde = i
+            break
+
+    for i in range(len(vulling_opties)):
+        if vulling_opties[i] in naam:
+            vulling_waarde = i
+            break
+
+    for i in range(len(aantal_opties)):
+        if aantal_opties[i] in naam:
+            aantal_waarde = i
+            break
+
+    # Teruggeven van de gevonden waarden (kan je zelf aanpassen)
+    return (kleur_waarde, vorm_waarde, vulling_waarde, aantal_waarde)
+
+    
+# returned een lijst met getallen die voor elke eigenschap staat 
     return [aantal, vorm, kleur, vulling]
 
 
@@ -95,8 +100,9 @@ pygame.display.set_caption("set spel")
 
 
 def teken_kaarten(kaarten, geselecteerd):
-    scherm.fill((255, 255, 255))
-    for i, k in enumerate(kaarten):
+    scherm.fill((0, 0, 0))
+    for i in range(len(kaarten)):
+        k = kaarten[i]
         rij = i // kaarten_per_rij
         kolom = i % kaarten_per_rij
         x = marge + kolom * (kaart_breedte + marge)
