@@ -229,9 +229,12 @@ while loopt:
         teken_scherm(tafel, geselecteerd, scorebord, timer,highlight_set=computer_keuze)
         pygame.time.delay(500)  # 0.5 seconde pauze    scorebord.computer_scoort()
         timer.reset()
-
-
-
+        for i in sorted(computer_keuze, reverse=TRUE):
+            if stapel: 
+                tafel[i] = stapel.pop(0)
+            else: 
+                del tafel[i]
+                
     clock.tick(30)
 
 pygame.quit()
