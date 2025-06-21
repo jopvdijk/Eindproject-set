@@ -3,12 +3,12 @@ import os
 import random
 import time
 
-# grootte kaarten 
+# card visualization 
 kaart_breedte = 120
 kaart_hoogte = 80
 kaarten_per_rij = 4
 marge = 20
-tijd_per_beurt = 30  # seconden om een set te vinden
+tijd_per_beurt = 30  # time to find a set
 map_kaarten = "kaarten"
 
 kleuren = ['rood', 'groen', 'paars']
@@ -16,16 +16,16 @@ vormen = ['ruit', 'golf', 'ovaal']
 vullingen = ['open', 'gevuld', 'gestreept']
 
 import os
-# verschillende eigenschappen halen uit bestandsnaam
+# checking the card features with the file names
 def lees_bestandsnaam(bestandsnaam):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
 
-#lijsten van alle verschillende mogelijke kenmerken, zijn in het Engels omdat ze zo in de bestandsnaam staan
+#list of all possible card features(same as in the file names)
     kleur_opties = ['red', 'green', 'purple']
     vorm_opties = ['oval', 'squiggle', 'diamond']
     vulling_opties = ['empty', 'shaded', 'filled']
     aantal_opties = ['1', '2', '3']
-
+#giving every feature a value corresponding to the place they have in the list
     for i, kleur in enumerate(kleur_opties):
         if kleur in naam:
             kleur_waarde = i
@@ -45,31 +45,32 @@ def lees_bestandsnaam(bestandsnaam):
 
     return (kleur_waarde, vorm_waarde, vulling_waarde, aantal_waarde)
 
-# class van de kaarten die de functie hierboven gebruikt om de eigenschappen in te vullen
+
+# Class that visualizes a card in the game by extracting the features from the filename
+# and loading the corresponding image inthe game.
 class kaart:
     def __init__(self, pad):
         self.pad = pad
         self.eigenschappen = lees_bestandsnaam(pad)
         self.afbeelding = pygame.transform.scale(
-            pygame.image.load(pad), (kaart_breedte, kaart_hoogte)
-        )
+            pygame.image.load(pad), (kaart_breedte, kaart_hoogte))
 
 
-# 3 kaarten zijn een set wanneer elk kenmerk of alles verschillend
-# heeft of alles hetzelfde, waarmee dus de lengte van de waarden
-# van de bijbehorende kenmerken dan 3 zou zijn als ze verschillend zijn
-# en 1 wanneer ze allemaal hetzelfde zijn, wat dan een set maakt 
-# bij len 2 verschillen 2 kaarten van kenmerk wat nooit een set kan zijn
-# waarmee dus wordt gecheckt of er een set is of niet zo.
+# 3 cards are a set when all features have 3 different characteristics or 3 the same characteristics.
+# which means the length of the values of the associated features 
+# would then be 3 if they are different
+# and 1 if they are all the same, which then makes a set.
+# with len 2, 2 cards differ from feature which can never be a set
+# and so the algorithm can easliy check whether there is a set or not.
 def is_set(k1, k2, k3):
     for i in range(4):
         waarden = {k1.eigenschappen[i], k2.eigenschappen[i], k3.eigenschappen[i]}
         if len(waarden) == 2:
             return False
     return True
-
-# elke mogelijkheid die er is langsgaan en checken of die aan bovenstaande definitie voldoet, maakt lijst aan
-# met alle mogelijke sets die erin zetten. 
+    
+#checking the definition above for every possible cards combinations 
+#and makes a list of all possible sets in that round of 12 cards.
 def vind_sets(kaarten):
     gevonden = []
     for i in range(len(kaarten)):
@@ -80,7 +81,7 @@ def vind_sets(kaarten):
     return gevonden
 
 
-# --- pygame setup ---
+# pygame setup(visualization of the game)
 pygame.init()
 lettertype = pygame.font.SysFont("arial", 20)
 rijen = 3
@@ -90,7 +91,7 @@ scherm = pygame.display.set_mode((scherm_breedte, scherm_hoogte))
 pygame.display.set_caption("set spel")
 
 
-# class voor timer met tekenen en resetten
+# class for the timer: resetting and adding the timer in to the screen.
 class Timer:
     def __init__(self, tijd_limiet):
         self.tijd_limiet = tijd_limiet
@@ -105,11 +106,11 @@ class Timer:
 
     def teken(self, scherm, font):
         resterend = int(self.tijd_over()) + 1
-        tekst = font.render(f"Tijd: {resterend}s", True, (255, 255, 255))  # wit
-        scherm.blit(tekst, (10, 10))  # linksboven
+        tekst = font.render(f"Tijd: {resterend}s", True, (255, 255, 255))
+        scherm.blit(tekst, (10, 10)) #left top corner
 
 
-# class voor scorebord, speler en computer bijhouden en tekenen
+# class for the scorebord: player, computer and adding the scoreboard to the screen.
 class Scorebord:
     def __init__(self):
         self.speler = 0
@@ -124,18 +125,19 @@ class Scorebord:
     def teken(self, scherm, font):
         tekst_speler = font.render(f"Speler: {self.speler}", True, (255, 255, 255))
         tekst_computer = font.render(f"Computer: {self.computer}", True, (255, 255, 255))
-        scherm.blit(tekst_speler, (120, 10))  # rechts naast timer
-        scherm.blit(tekst_computer, (120 + tekst_speler.get_width() + 20, 10))  # naast speler
+        scherm.blit(tekst_speler, (120, 10))  # next to the timer
+        scherm.blit(tekst_computer, (120 + tekst_speler.get_width() + 20, 10))  # next to the player
 
 
-# deze functie tekent ALLES: kaarten, timer en scorebord in 1 frame
+# Adding every aspect to one frame on the screen
 def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None, computer_set=None):
-    scherm.fill((0, 0, 0))  # zwart scherm
-
-    timer.teken(scherm, lettertype)  # timer linksboven
-    scorebord.teken(scherm, lettertype)  # score rechts van timer
-
-    nummer_font = pygame.font.SysFont("arial", 16)  # kleiner lettertype voor nummers
+    scherm.fill((0, 0, 0))  
+    
+# Timer and scoreboard 
+    timer.teken(scherm, lettertype)  
+    scorebord.teken(scherm, lettertype)  
+# Numbers on the cards
+    nummer_font = pygame.font.SysFont("arial", 16)  
 
     for i in range(len(kaarten)):
         k = kaarten[i]
@@ -146,20 +148,20 @@ def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None, co
 
         scherm.blit(k.afbeelding, (x, y))
 
-        # Kaartnummer linksboven op de kaart, zwart, iets naar binnen
+        # Adding numbers to the cards
         nummer = str(i + 1)
         tekst = nummer_font.render(nummer, True, (0, 0, 0))
         scherm.blit(tekst, (x + 5, y + 4))
 
-        # Rode rand bij geselecteerde kaarten
+        # Red outline while sellecting the cards.
         if i in geselecteerd:
             pygame.draw.rect(scherm, (255, 0, 0), (x, y, kaart_breedte, kaart_hoogte), 4)
 
-        # Groene rand als een set door speler is gevonden
+        # Green outline when the set is found
         if highlight_set and i in highlight_set:
             pygame.draw.rect(scherm, (0, 255, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
 
-        # Rode rand als set door computer gekozen wordt getoond
+        # Red outline on the set that is found by the computer.
         if computer_set and i in computer_set:
             pygame.draw.rect(scherm, (255, 0, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
 
@@ -237,6 +239,7 @@ while loopt:
         
         #tijd wordt gereset nadat de computer een set heeft gekozen
         timer.reset()
+
         
         #van de gekozen zet moeten de kaarten die gekozen zijn gepopt worden
         for i in sorted(computer_keuze, reverse=TRUE):
