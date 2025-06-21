@@ -20,29 +20,32 @@ vullingen = ['open', 'gevuld', 'gestreept']
 def lees_bestandsnaam(bestandsnaam):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
 
+    #lijsten met alle mogelijke eigenschappen zoals ze genoteerd staan in de bestandsnaam van de kaarten 
     kleur_opties = ['red', 'green', 'purple']
     vorm_opties = ['oval', 'squiggle', 'diamond']
     vulling_opties = ['empty', 'shaded', 'filled']
     aantal_opties = ['1', '2', '3']
 
-        for i, kleur in enumerate(kleuren):
+    # dit werkt door voor een index i en kleur uit de verschillende mogelijke kleuren dan te checken of de kleur in de naam van het bestand zit
+    # als die in het bestand zit dan wordt de output kleurwaarde de index bij de bijbehorende kleur. Deze methode passen we toe op elke eigenschap
+    # zo wordt een output gevormd die de eigenschappen van elke kaart weergeeft aan de hand van een lijst getallen. 
+    for i, kleur in enumerate(kleur_opties):
             if kleur in naam:
                 kleur_waarde = i
                 break
-        for i, vorm in enumerate(vormen):
+    for i, vorm in enumerate(vorm_opties):
             if vorm in naam:
                 vorm_waarde = i
                 break
-        for i, vulling in enumerate(vullingen):
+    for i, vulling in enumerate(vulling_opties):
             if vulling in naam:
                 vulling_waarde = i
                 break
-        for i, aantal in enumerate(aantallen):
+    for i, aantal in enumerate(aantal_opties):
             if aantal in naam:
                 aantal_waarde = i
                 break
-    
-# returned een lijst met getallen die voor elke eigenschap staat 
+     
     return [aantal, vorm, kleur, vulling]
 
 
