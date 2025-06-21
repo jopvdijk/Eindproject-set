@@ -3,7 +3,7 @@ import os
 import random
 import time
 
-# --- configuratie ---
+# grootte kaarten 
 kaart_breedte = 120
 kaart_hoogte = 80
 kaarten_per_rij = 4
@@ -16,7 +16,7 @@ vormen = ['ruit', 'golf', 'ovaal']
 vullingen = ['open', 'gevuld', 'gestreept']
 
 
-# --- hulpfunctie om eigenschappen uit bestandsnaam te halen ---
+# verschillende eigenschappen halen uit de bestandsnaam 
 def lees_bestandsnaam(bestandsnaam):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
 
@@ -29,11 +29,12 @@ def lees_bestandsnaam(bestandsnaam):
     vorm = next(i for i, v in enumerate(vorm_opties) if v in naam)
     vulling = next(i for i, v in enumerate(vulling_opties) if v in naam)
     aantal = next(i for i, a in enumerate(aantal_opties) if a in naam)
-
+    
+# returned een lijst met getallen die voor elke eigenschap staat 
     return [aantal, vorm, kleur, vulling]
 
 
-# --- kaartklasse ---
+# class van de kaarten die de functie hierboven gebruikt om de eigenschappen in te vullen
 class kaart:
     def __init__(self, pad):
         self.pad = pad
@@ -43,7 +44,12 @@ class kaart:
         )
 
 
-# --- setlogica ---
+# 3 kaarten zijn een set wanneer elk kenmerk of alles verschillend
+    #heeft of alles hetzelfde, waarmee dus de lengte van de waarden
+    #van de bijbehorende kenmerekn dan 3 zou zijn als ze verschillend zijn
+    #en 1 wanneer ze allemaal hetzeflde zijn, wat dan een set maakt 
+    #bij len 2 verschillen 2 kaarten van kenmerk wat nooit een set kan zijn
+    #waarmee dus wordt gecheckt of er een set is of niet zo.
 def is_set(k1, k2, k3):
     for i in range(4):
         waarden = {k1.eigenschappen[i], k2.eigenschappen[i], k3.eigenschappen[i]}
@@ -51,7 +57,8 @@ def is_set(k1, k2, k3):
             return False
     return True
 
-
+# elke mogelijkheid die er is langsgaan en checken of die aan bovenstaande definitie voldoet, maakt lijst aan
+# met alle mogelijke sets die erin zetten. 
 def vind_sets(kaarten):
     gevonden = []
     for i in range(len(kaarten)):
