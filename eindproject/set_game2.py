@@ -170,29 +170,29 @@ def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None, co
 
 
 
-# dit zorgt ervoor dat van alle kaarten een willekeurige volgorde wordt genomen en de kaarten worden geladen 
+# makes sure that all cards are loaded and taken in a random order 
 alle_paden = [os.path.join(map_kaarten, f) for f in os.listdir(map_kaarten) if f.endswith(".gif")]
 random.shuffle(alle_paden)
 stapel = [kaart(p) for p in alle_paden]
 tafel = stapel[:12]
 stapel = stapel[12:]
 
-scorebord = Scorebord()  # maak scorebord aan
-timer = Timer(tijd_per_beurt)  # maak timer aan
+scorebord = Scorebord()  
+timer = Timer(tijd_per_beurt)  
 geselecteerd = []
 loopt = True
-clock = pygame.time.Clock()  # maakt een clock aan 
+clock = pygame.time.Clock()  
 
 
 while loopt:
-    #alles laten tekenen via de functie teken_scherm
+    #while running the entire game needs to be drawn through teken_scherm
     teken_scherm(tafel, geselecteerd, scorebord, timer)  
     sets_op_tafel = vind_sets(tafel)
-    computer_keuze = random.choice(sets_op_tafel) if sets_op_tafel else None #is nodig voor later om een computerkeuze vast te stellen uit de mogelijk sets op tafel 
+    computer_keuze = random.choice(sets_op_tafel) if sets_op_tafel else None #is necessary for later in order to determine a set that the computer chooses when the time runs out 
     for gebeurtenis in pygame.event.get():
         if gebeurtenis.type == pygame.QUIT:
             loopt = False
-#dit is wanneer er met een muisklik geklikt wordt, zorgt ervoor dat de kaart waarop is geklikt wordt opgeslagen en teogevoegd aan geselecteerd 
+#this is when a mousclick happens on a card, the position is noted and the card is moved into geselcteerd  
         elif gebeurtenis.type == pygame.MOUSEBUTTONDOWN:
             x, y = gebeurtenis.pos 
             kolom = (x - marge) // (kaart_breedte + marge)
@@ -205,17 +205,16 @@ while loopt:
                         geselecteerd.remove(index)
                     else:
                         geselecteerd.append(index)
-# alleen zinvol om te checken wanneer 3 kaarten geselecteerd zijn 
+# only useful to check if things are a set if three cards are selected 
                     if len(geselecteerd) == 3:
                         i1, i2, i3 = geselecteerd
-# checken via de functie of de geselecteerde kaarten een set vormen, 
-# daarna in de functie teken_scherm zorgen dat de geselcteerde sets gehighlight worden wanneer ze een set zijn
+# checking if the selected cards are set through the function is_set, highlighting the set with teken_scherm if they are correct 
  
                         if is_set(tafel[i1], tafel[i2], tafel[i3]):
                             teken_scherm(tafel, geselecteerd, scorebord, timer, highlight_set=geselecteerd)
-                            pygame.time.delay(500)  # halve seconde pauze zodat ff te zien is wel dat het gehighlight is 
+                            pygame.time.delay(500)  # half a second delay so the highlight after a correct set is appointed is visible
                             scorebord.speler_scoort() 
-                            # verwijder de kaarten die een set vormen en vervang ze door nieuwe kaarten van de stapel als die er zijn
+                            # if the selected cards are a set they need to be popped and replaced
                             for i in sorted(geselecteerd, reverse=True):
                                 if stapel:
                                     tafel[i] = stapel.pop(0)
@@ -223,25 +222,24 @@ while loopt:
                                     del tafel[i]
                             timer.reset()
                         else:
-                            # geen set betekent gewoon deselecteren 
+                            # no set means deselecting the selected cards
                             pass
                         geselecteerd = []
 
-    # dit gedeelte gaat over de dingen die gebeuren wanneer de tijd verlopen en dus de computer een punt heeft. 
+    # events that need to happen when the time is over and the computer wins that point
     if timer.tijd_over() <= 0:
-        #dit verwijst naar de class van het scorebord zodat er een punt bij de computer komt 
+        #references to class scoreboard so the computers score goes up by one if the time for the player is over. 
         scorebord.computer_scoort()
         
-        #dit verwijst naar de functie teken_scherm om de highlights toe te passen op het setje dat de computer kiest, zodat duidelijk is voor de speler
-        #welke set ze gemist hebben en welke de computer heeft gekozen
+        #this references the function teken_scherm to highlight the set that the computer chooses, making it visible to the player which set they missed
         teken_scherm(tafel, geselecteerd, scorebord, timer,highlight_set=computer_keuze)
         pygame.time.delay(500)  # 0.5 seconde pauze    scorebord.computer_scoort()
         
-        #tijd wordt gereset nadat de computer een set heeft gekozen
+        #the time also needs to be reset after the computer has found a set
         timer.reset()
 
         
-        #van de gekozen zet moeten de kaarten die gekozen zijn gepopt worden
+        #the cards of the chosen set from the computer need to be popped 
         for i in sorted(computer_keuze, reverse=TRUE):
             if stapel: 
                 tafel[i] = stapel.pop(0)
