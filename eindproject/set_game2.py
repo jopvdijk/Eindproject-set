@@ -160,9 +160,9 @@ def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None, co
         if highlight_set and i in highlight_set:
             pygame.draw.rect(scherm, (0, 255, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
 
-        # Red outline on the set that is found by the computer.
+        # Green outline on the set that is found by the computer.
         if computer_set and i in computer_set:
-            pygame.draw.rect(scherm, (255, 0, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
+            pygame.draw.rect(scherm, (0, 255, 0), (x - 2, y - 2, kaart_breedte + 4, kaart_hoogte + 4), 4)
 
     pygame.display.flip()
 
