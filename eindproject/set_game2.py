@@ -15,7 +15,6 @@ kleuren = ['rood', 'groen', 'paars']
 vormen = ['ruit', 'golf', 'ovaal']
 vullingen = ['open', 'gevuld', 'gestreept']
 
-import os
 # checking the card features with the file names
 def lees_bestandsnaam(bestandsnaam):
     naam = os.path.basename(bestandsnaam).replace(".gif", "").lower()
@@ -144,7 +143,7 @@ def teken_scherm(kaarten, geselecteerd, scorebord, timer, highlight_set=None, co
         rij = i // kaarten_per_rij
         kolom = i % kaarten_per_rij
         x = marge + kolom * (kaart_breedte + marge)
-        y = marge + rij * (kaart_hoogte + marge) + 40  # ruimte bovenin voor timer/score
+        y = marge + rij * (kaart_hoogte + marge) + 40  # space for timer/score
 
         scherm.blit(k.afbeelding, (x, y))
 
@@ -233,14 +232,14 @@ while loopt:
         
         #this references the function teken_scherm to highlight the set that the computer chooses, making it visible to the player which set they missed
         teken_scherm(tafel, geselecteerd, scorebord, timer,highlight_set=computer_keuze)
-        pygame.time.delay(500)  # 0.5 seconde pauze    scorebord.computer_scoort()
+        pygame.time.delay(1000)  # 1.0 seconds delay    scorebord.computer_scoort()
         
         #the time also needs to be reset after the computer has found a set
         timer.reset()
 
         
         #the cards of the chosen set from the computer need to be popped 
-        for i in sorted(computer_keuze, reverse=TRUE):
+        for i in sorted(computer_keuze, reverse=True):
             if stapel: 
                 tafel[i] = stapel.pop(0)
             else: 
