@@ -180,14 +180,14 @@ scorebord = Scorebord()
 timer = Timer(tijd_per_beurt)  
 geselecteerd = []
 loopt = True
-clock = pygame.time.Clock()  
-
+clock = pygame.time.Clock() 
 
 while loopt:
     #while running the entire game needs to be drawn through teken_scherm
     teken_scherm(tafel, geselecteerd, scorebord, timer)  
     sets_op_tafel = vind_sets(tafel)
-    computer_keuze = random.choice(sets_op_tafel) if sets_op_tafel else None #is necessary for later in order to determine a set that the computer chooses when the time runs out 
+    computer_keuze = random.choice(sets_op_tafel) if sets_op_tafel else None 
+    #^is necessary for later in order to determine a set that the computer chooses when the time runs out^
     for gebeurtenis in pygame.event.get():
         if gebeurtenis.type == pygame.QUIT:
             loopt = False
@@ -225,26 +225,35 @@ while loopt:
                             pass
                         geselecteerd = []
 
-    # events that need to happen when the time is over and the computer wins that point
+    # events that need to happen when the time is over:
     if timer.tijd_over() <= 0:
-        #references to class scoreboard so the computers score goes up by one if the time for the player is over. 
-        scorebord.computer_scoort()
-        
-        #this references the function teken_scherm to highlight the set that the computer chooses, making it visible to the player which set they missed
-        teken_scherm(tafel, geselecteerd, scorebord, timer,highlight_set=computer_keuze)
-        pygame.time.delay(1000)  # 1.0 seconds delay    scorebord.computer_scoort()
-        
-        #the time also needs to be reset after the computer has found a set
-        timer.reset()
-
-        
-        #the cards of the chosen set from the computer need to be popped 
-        for i in sorted(computer_keuze, reverse=True):
-            if stapel: 
-                tafel[i] = stapel.pop(0)
-            else: 
-                del tafel[i]
-                
+        if computer_keuze:
+            #references to class scoreboard so the computers score goes up by one if the time for the player is over. 
+            scorebord.computer_scoort()
+            #this references the function teken_scherm to highlight the set that the computer chooses, 
+            # making it visible to the player which set they missed
+            teken_scherm(tafel, geselecteerd, scorebord, timer,highlight_set=computer_keuze)
+            pygame.time.delay(1000)  # 1.0 seconds delay    scorebord.computer_scoort()
+            #the cards of the chosen set form the computer are being popped
+            for i in sorted(computer_keuze, reverse=True):
+                if stapel:
+                    tafel[i] = stapel.pop(0)
+                else:
+                    del tafel[i]
+        else:
+        # No sets found: displace the upper 3 cards by 3 new cards.
+            print()
+            for i in range(min(3, len(tafel))):
+                if stapel:
+                    tafel[i] = stapel.pop(0)
+        #the time also needs to be reset after the computer has found a set or when there is no sets on the table.
+        timer.reset()    
+        #when there are no cards left and no more sets on the table the game stops.
+        if not stapel and not vind_sets(tafel):
+            print("Game Ended!")
+            loopt = False      
     clock.tick(30)
 
 pygame.quit()
+
+
